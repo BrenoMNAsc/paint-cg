@@ -1,3 +1,0 @@
-C:/Users/bnascimento/CLionProjects/paint-cg/cmake-build-debug/CMakeFiles/paint_cg.dir
-C:/Users/bnascimento/CLionProjects/paint-cg/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/bnascimento/CLionProjects/paint-cg/cmake-build-debug/CMakeFiles/rebuild_cache.dir
