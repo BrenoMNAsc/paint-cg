@@ -25,8 +25,6 @@ void reshape(int w, int h) {
     glLoadIdentity();
 }
 
-
-
 // Função de inicialização
 void inicializar() {
     objetos = criar_objetos();
@@ -38,17 +36,34 @@ void inicializar() {
 void teclado(unsigned char key, int x, int y) {
     switch (key) {
         case 'q':
-            modo_desenho = 0;  // Modo de desenhar pontos
-        printf("Modo: Pontos\n");
-        break;
+            if (modo_desenho != 0) {
+                cancelar_operacao(&objetos);
+                modo_desenho = 0;  // Modo de desenhar pontos
+                printf("Modo: Pontos\n");
+            }
+            break;
         case 'w':
-            modo_desenho = 1;  // Modo de desenhar linhas
-        printf("Modo: Linhas\n");
-        break;
+            if (modo_desenho != 1) {
+                if(modo_desenho == 2) cancelar_operacao(&objetos);
+                modo_desenho = 1;  // Modo de desenhar linhas
+                printf("Modo: Linhas\n");
+            }
+            break;
         case 'e':
-            modo_desenho = 2;  // Modo de desenhar polígonos
-        printf("Modo: Polígonos\n");
-        break;
+            if(modo_desenho != 2) {
+                if(modo_desenho == 1) cancelar_operacao(&objetos);
+                modo_desenho = 2;  // Modo de desenhar polígonos
+                printf("Modo: Polígonos\n");
+            }
+            break;
+        case 27:
+            cancelar_operacao(&objetos);
+        case 13:  // Tecla Enter
+            if (modo_desenho == 2) {
+                adicionar_poligono(&objetos, (Ponto){0, 0}, 1);  // Finaliza o polígono
+                printf("Polígono finalizado!\n");
+            }
+            break;
     }
 }
 
@@ -66,13 +81,12 @@ void mouse(int button, int state, int x, int y) {
         } else if (modo_desenho == 1) {
             adicionar_linha(&objetos, x_convertido, y_convertido);
         } else if (modo_desenho == 2) {
-            //adicionar_poligono(&objetos, x_convertido, y_convertido);
+            adicionar_poligono(&objetos, (Ponto){x_convertido, y_convertido}, 0);  // Adiciona vértice ao polígono
+            printf("Vértice do polígono adicionado: (%f, %f)\n", x_convertido, y_convertido);
         }
     }
     glutPostRedisplay();
 }
-
-
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);

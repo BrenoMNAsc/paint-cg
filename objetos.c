@@ -7,6 +7,10 @@
 Ponto ponto_inicial_linha;
 int esperando_segundo_ponto = 0;  // Flag para saber se estamos aguardando o segundo ponto da linha
 
+// Variáveis estáticas para o polígono
+Ponto* pontos_poligono = NULL;  // Armazena os pontos temporários do polígono
+int num_pontos_poligono = 0;    // Conta o número de pontos temporários do polígono
+
 ObjetosGeometricos criar_objetos() {
     ObjetosGeometricos objs;
     objs.pontos = NULL;
@@ -43,6 +47,9 @@ void adicionar_linha(ObjetosGeometricos* objetos, float x, float y) {
         esperando_segundo_ponto = 0;  // Reset para a próxima linha
 
         printf("Linha adicionada: (%f, %f) -> (%f, %f)\n", ponto_inicial_linha.x, ponto_inicial_linha.y, x, y);
+
+        // Redesenhar a tela
+        glutPostRedisplay();
     }
 }
 
@@ -55,6 +62,9 @@ void adicionar_ponto(ObjetosGeometricos* objetos, float x, float y) {
     objetos->pontos[objetos->num_pontos].x = x;
     objetos->pontos[objetos->num_pontos].y = y;
     objetos->num_pontos++;
+
+    // Redesenhar a tela
+    glutPostRedisplay();
 }
 
 void remover_ultimo_ponto(ObjetosGeometricos* objetos) {
@@ -72,17 +82,86 @@ void remover_ultimo_ponto(ObjetosGeometricos* objetos) {
         }
 
         printf("Ponto removido. Agora há %d pontos.\n", objetos->num_pontos);
+
+        // Redesenhar a tela
+        glutPostRedisplay();
     } else {
         printf("Nenhum ponto para remover.\n");
     }
 }
 
+void adicionar_poligono(ObjetosGeometricos* objetos, Ponto novo_ponto, int finalizar) {
+    if (!finalizar) {
+        // Adicionar ponto ao polígono
+        adicionar_ponto(objetos, novo_ponto.x, novo_ponto.y);
+        pontos_poligono = realloc(pontos_poligono, (num_pontos_poligono + 1) * sizeof(Ponto));
+        if (pontos_poligono == NULL) {
+            fprintf(stderr, "Erro ao alocar memória para os pontos do polígono.\n");
+            exit(EXIT_FAILURE);
+        }
+        pontos_poligono[num_pontos_poligono] = novo_ponto;  // Adiciona novo ponto
+        num_pontos_poligono++;
 
-void adicionar_poligono(ObjetosGeometricos* objetos) {
-    // Implementação futura para adicionar polígonos
+        printf("Ponto adicionado ao polígono: (%f, %f)\n", novo_ponto.x, novo_ponto.y);
+    } else {
+        if (num_pontos_poligono > 2) {
+            for (int i = 0; i < num_pontos_poligono; i++) {
+                remover_ultimo_ponto(objetos);
+            }
+            // Finalizar polígono e adicionar à lista de polígonos
+            objetos->poligonos = realloc(objetos->poligonos, (objetos->num_poligonos + 1) * sizeof(Poligono));
+            if (objetos->poligonos == NULL) {
+                fprintf(stderr, "Erro ao alocar memória para os polígonos.\n");
+                exit(EXIT_FAILURE);
+            }
+
+            // Copia os pontos para o novo polígono
+            objetos->poligonos[objetos->num_poligonos].pontos = pontos_poligono;
+            objetos->poligonos[objetos->num_poligonos].num_pontos = num_pontos_poligono;
+
+            // Incrementa o número de polígonos
+            objetos->num_poligonos++;
+
+            printf("Polígono finalizado com %d pontos.\n", num_pontos_poligono);
+
+            // Resetar as variáveis estáticas
+            pontos_poligono = NULL;
+            num_pontos_poligono = 0;
+
+            // Redesenhar a tela
+            glutPostRedisplay();
+        } else {
+            printf("Polígono precisa de pelo menos 3 pontos.\n");
+        }
+    }
 }
 
-// Função
+// Função para cancelar a operação atual
+void cancelar_operacao(ObjetosGeometricos* objetos) {
+    // Cancelar a operação de linha
+    if (esperando_segundo_ponto == 1) {
+        esperando_segundo_ponto = 0;  // Cancelar a espera pelo segundo ponto
+        remover_ultimo_ponto(objetos);  // Remover o ponto inicial da linha
+        printf("Operação de linha cancelada.\n");
+    }
+
+    // Cancelar a operação de polígono
+    if (num_pontos_poligono > 0) {
+        // Remover todos os pontos temporários do polígono
+        for (int i = 0; i < num_pontos_poligono; i++) {
+            remover_ultimo_ponto(objetos);
+        }
+        num_pontos_poligono = 0;
+        free(pontos_poligono);
+        pontos_poligono = NULL;
+        printf("Operação de polígono cancelada.\n");
+
+        // Redesenhar a tela
+        glutPostRedisplay();
+    }
+}
+
+// Função para desenhar todos os objetos geométricos
 void desenhar_objetos(ObjetosGeometricos* objetos) {
     glColor3f(1.0f, 0.0f, 0.0f);
     glPointSize(5.0f);
@@ -101,5 +180,14 @@ void desenhar_objetos(ObjetosGeometricos* objetos) {
     }
     glEnd();
 
+    // Desenhar os polígonos
+    glColor3f(0.0f, 1.0f, 0.0f);  // Cor dos polígonos
+    for (int i = 0; i < objetos->num_poligonos; i++) {
+        glBegin(GL_POLYGON);  // Desenhar os polígonos preenchidos
+        for (int j = 0; j < objetos->poligonos[i].num_pontos; j++) {
+            glVertex2f(objetos->poligonos[i].pontos[j].x, objetos->poligonos[i].pontos[j].y);
+        }
+        glEnd();
+    }
     glFlush();
 }
