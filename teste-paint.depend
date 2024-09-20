@@ -1,7 +1,9 @@
 # depslib dependency file v1.0
-1726349333 source:c:\users\computador\downloads\c\teste-paint\main.c
+1726834949 source:c:\users\computador\downloads\c\teste-paint\main.c
 	<stdio.h>
 	<stdlib.h>
 	<windows.h>
 	<GL/glut.h>
+	<GL/gl.h>
+	<math.h>
 

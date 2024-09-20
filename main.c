@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <GL/glut.h>
+#include <GL/gl.h>
+#include <math.h>
 
 typedef struct {
     float x;
@@ -9,34 +11,114 @@ typedef struct {
 } Ponto;
 
 GLfloat triangulo[3][2] = {
-    {-50.0, -10.0},
-    {-30.0, -10.0},
-    {-40.0, 10.0}
+    {-40.0, -10.0},
+    {-20.0, -10.0},
+    {-30.0, 10.0}
 };
 
-GLfloat triangulo_x = 0;
-GLfloat triangulo_y = 0;
-
-void especial(int key, int x, int y) {
-    switch(key) {
-        case GLUT_KEY_LEFT:
-            triangulo_x -= 5.0;
-            break;
-        case GLUT_KEY_RIGHT:
-            triangulo_x += 5.0;
-            break;
-        case GLUT_KEY_UP:
-            triangulo_y += 5.0;
-            break;
-        case GLUT_KEY_DOWN:
-            triangulo_y -= 5.0;
-            break;
+Ponto centroide_triangulo(GLfloat triangulo[][2]) {
+    Ponto centroide;
+    centroide.x = 0;
+    centroide.y = 0;
+    for (int i = 0; i < 3; i++) {
+        centroide.x += triangulo[i][0];
+        centroide.y += triangulo[i][1];
     }
-    glutPostRedisplay();
+    centroide.x /= 3;
+    centroide.y /= 3;
+    return centroide;
 }
 
-void translate2D(GLfloat tx, GLfloat ty) {
-    glTranslatef(tx, ty, 0.0f);
+void transladar(GLfloat tx, GLfloat ty) {
+    GLfloat matriz_translacao[16] = {
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        tx, ty, 0.0, 1.0
+    };
+
+    glMultMatrixf(matriz_translacao);
+}
+
+void rotacionar(GLfloat angulo) {
+    // transformar graus em radianos, pois a funcao cos e sin trabalham com radianos
+    GLfloat cose = cos(angulo * M_PI / 180.0);
+    GLfloat sen = sin(angulo * M_PI / 180.0);
+
+    GLfloat matriz_rotacao[16] = {
+        cose, sen, 0.0, 0.0,
+        -sen, cose, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    };
+
+    glMultMatrixf(matriz_rotacao);
+}
+
+void escalar(GLfloat x, GLfloat y) {
+    GLfloat matriz_escala[16] = {
+        x, 0.0, 0.0, 0.0,
+        0.0, y, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    };
+
+    glMultMatrixf(matriz_escala);
+}
+
+void reflexao_vertical() {
+    GLfloat matriz_reflexao[16] = {
+        1.0,  0.0, 0.0, 0.0,
+        0.0, -1.0, 0.0, 0.0,
+        0.0,  0.0, 1.0, 0.0,
+        0.0,  0.0, 0.0, 1.0
+    };
+
+    glMultMatrixf(matriz_reflexao);
+}
+
+void reflexao_horizontal() {
+    GLfloat matriz_reflexao[16] = {
+        -1.0,  0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0,  0.0, 1.0, 0.0,
+        0.0,  0.0, 0.0, 1.0
+    };
+
+    glMultMatrixf(matriz_reflexao);
+}
+
+void reflexao_diagonal() {
+    GLfloat matriz_reflexao[16] = {
+        -1.0, 0.0, 0.0, 0.0,
+        0.0, -1.0, 0.0, 0.0,
+        0.0,  0.0, 1.0, 0.0,
+        0.0,  0.0, 0.0, 1.0
+    };
+
+    glMultMatrixf(matriz_reflexao);
+}
+
+void cisalhamento_y(GLfloat c) {
+    GLfloat matriz_cisalhamento[16] = {
+        1.0, c, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0,  0.0, 1.0, 0.0,
+        0.0,  0.0, 0.0, 1.0
+    };
+
+    glMultMatrixf(matriz_cisalhamento);
+}
+
+void cisalhamento_x(GLfloat c) {
+    GLfloat matriz_cisalhamento[16] = {
+        1.0, 0.0, 0.0, 0.0,
+        c, 1.0, 0.0, 0.0,
+        0.0,  0.0, 1.0, 0.0,
+        0.0,  0.0, 0.0, 1.0
+    };
+
+    glMultMatrixf(matriz_cisalhamento);
 }
 
 void criar_triangulo() {
@@ -46,19 +128,6 @@ void criar_triangulo() {
         glVertex2fv(triangulo[i]);
     }
     glEnd();
-}
-
-Ponto centroide_triangulo(GLfloat triangulo[3][2], GLfloat tx, GLfloat ty) {
-    Ponto centroide;
-    centroide.x = 0;
-    centroide.y = 0;
-    for (int i = 0; i < 3; i++) {
-        centroide.x += triangulo[i][0] + tx;
-        centroide.y += triangulo[i][1] + ty;
-    }
-    centroide.x /= 3;
-    centroide.y /= 3;
-    return centroide;
 }
 
 void init() {
@@ -73,8 +142,14 @@ void display() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glPushMatrix();
-        Ponto centro = centroide_triangulo(triangulo, triangulo_x, triangulo_y);
-        translate2D(triangulo_x, triangulo_y);
+        Ponto centro = centroide_triangulo(triangulo);
+        transladar(centro.x, centro.y);
+        rotacionar(90);
+        transladar(-centro.x, -centro.y);
+        Ponto centro2 = centroide_triangulo(triangulo);
+        transladar(centro2.x, centro2.y);
+        escalar(2.0, 2.0);
+        transladar(-centro2.x, -centro2.y);
         criar_triangulo();
     glPopMatrix();
 
@@ -88,7 +163,6 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(0, 0);
     glutCreateWindow("Paint");
 
-    glutSpecialFunc(especial);
     init();
 
     glutDisplayFunc(display);
