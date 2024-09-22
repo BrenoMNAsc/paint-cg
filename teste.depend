@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1727017495 source:c:\users\computador\downloads\c\teste\main.c
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+	<GL/glut.h>
+	<math.h>
+
