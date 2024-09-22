@@ -9,12 +9,16 @@ typedef struct {
 // Definição de uma estrutura para representar uma linha (composta de dois pontos)
 typedef struct {
     Ponto inicio, fim;
+    float xcentroide;
+    float ycentroide;
 } Linha;
 
 // Definição de uma estrutura para representar um polígono (composto por vários vértices)
 typedef struct {
     Ponto* pontos;    // Array de pontos que formam o polígono
     int num_pontos;   // Número de vértices (pontos) no polígono
+    float xcentroide;
+    float ycentroide;
 } Poligono;
 
 // Estrutura principal que contém listas de pontos, linhas e polígonos

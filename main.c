@@ -103,7 +103,7 @@ void mouse(int button, int state, int x, int y) {
             printf("Vértice do polígono adicionado: (%f, %f)\n", x_convertido, y_convertido);
         }
     } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-        selecionar_linha(&objetos, x_convertido, y_convertido);
+        selecionar_area(&objetos, x_convertido, y_convertido);
     }
     glutPostRedisplay();
 }
