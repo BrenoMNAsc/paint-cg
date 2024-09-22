@@ -1,15 +1,33 @@
 #include <stdio.h>
 #include <GL/glut.h>
 #include "objetos.h"
+#include "selecoes.h"
 
 // Variáveis globais
 ObjetosGeometricos objetos;
 int modo_desenho = 0;  // 0: pontos, 1: linhas, 2: polígonos
+float mouse_x = 0.0f, mouse_y = 0.0f;  // Coordenadas atuais do mouse
+
+// Função para desenhar uma caixa de tolerância de 5x5 ao redor do mouse
+void desenhar_caixa_tolerancia(float x, float y) {
+    float half_size = 5.0f / 2.0f;  // Metade do tamanho da caixa
+    glColor3f(0.0f, 1.0f, 0.0f);  // Cor da caixa (verde)
+    glBegin(GL_LINE_LOOP);
+        glVertex2f(x - half_size, y - half_size);  // Canto inferior esquerdo
+        glVertex2f(x + half_size, y - half_size);  // Canto inferior direito
+        glVertex2f(x + half_size, y + half_size);  // Canto superior direito
+        glVertex2f(x - half_size, y + half_size);  // Canto superior esquerdo
+    glEnd();
+}
 
 // Função de exibição
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     desenhar_objetos(&objetos);
+
+    // Desenhar a caixa de tolerância no ponto atual do mouse
+    desenhar_caixa_tolerancia(mouse_x, mouse_y);
+
     glutSwapBuffers();  // Para duplo buffer
 }
 
@@ -69,12 +87,12 @@ void teclado(unsigned char key, int x, int y) {
 
 // Função de mouse
 void mouse(int button, int state, int x, int y) {
-    if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
-        int width = glutGet(GLUT_WINDOW_WIDTH);
-        int height = glutGet(GLUT_WINDOW_HEIGHT);
+    int width = glutGet(GLUT_WINDOW_WIDTH);
+    int height = glutGet(GLUT_WINDOW_HEIGHT);
+    float x_convertido = (float)x / width * 500.0f;
+    float y_convertido = (float)(height - y) / height * 500.0f;
 
-        float x_convertido = (float)x / width * 500.0f;
-        float y_convertido = (float)(height - y) / height * 500.0f;
+    if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
 
         if (modo_desenho == 0) {
             adicionar_ponto(&objetos, x_convertido, y_convertido);
@@ -84,8 +102,22 @@ void mouse(int button, int state, int x, int y) {
             adicionar_poligono(&objetos, (Ponto){x_convertido, y_convertido}, 0);  // Adiciona vértice ao polígono
             printf("Vértice do polígono adicionado: (%f, %f)\n", x_convertido, y_convertido);
         }
+    } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        selecionar_linha(&objetos, x_convertido, y_convertido);
     }
     glutPostRedisplay();
+}
+
+// Função chamada sempre que o mouse se move, usada para atualizar a posição do mouse
+void passive_motion(int x, int y) {
+    int width = glutGet(GLUT_WINDOW_WIDTH);
+    int height = glutGet(GLUT_WINDOW_HEIGHT);
+
+    // Converte as coordenadas da tela para o sistema de coordenadas da janela (0 a 500)
+    mouse_x = (float)x / width * 500.0f;
+    mouse_y = (float)(height - y) / height * 500.0f;
+
+    glutPostRedisplay();  // Solicita a atualização da tela
 }
 
 int main(int argc, char** argv) {
@@ -100,6 +132,7 @@ int main(int argc, char** argv) {
     glutMouseFunc(mouse);
     glutKeyboardFunc(teclado);  // Define a função de teclado
     glutReshapeFunc(reshape);
+    glutPassiveMotionFunc(passive_motion);  // Atualiza a posição do mouse enquanto ele se move
 
     glutMainLoop();
 

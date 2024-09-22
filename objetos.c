@@ -17,6 +17,7 @@ ObjetosGeometricos criar_objetos() {
     objs.linhas = NULL;
     objs.poligonos = NULL;
     objs.num_pontos = objs.num_linhas = objs.num_poligonos = 0;
+    objs.linha_selecionada, objs.ponto_selecionado, objs.poligono_selecionado = -1;
     return objs;
 }
 
@@ -62,6 +63,8 @@ void adicionar_ponto(ObjetosGeometricos* objetos, float x, float y) {
     objetos->pontos[objetos->num_pontos].x = x;
     objetos->pontos[objetos->num_pontos].y = y;
     objetos->num_pontos++;
+
+    printf("Ponto: (%f, %f)\n", x, y);
 
     // Redesenhar a tela
     glutPostRedisplay();
