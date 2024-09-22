@@ -17,6 +17,7 @@ ObjetosGeometricos criar_objetos() {
     objs.linhas = NULL;
     objs.poligonos = NULL;
     objs.num_pontos = objs.num_linhas = objs.num_poligonos = 0;
+    objs.linha_selecionada, objs.ponto_selecionado, objs.poligono_selecionado = -1;
     return objs;
 }
 
@@ -42,11 +43,17 @@ void adicionar_linha(ObjetosGeometricos* objetos, float x, float y) {
         objetos->linhas[objetos->num_linhas].fim.x = x;
         objetos->linhas[objetos->num_linhas].fim.y = y;
 
+        // Cálculo do centróide da linha (ponto médio)
+        objetos->linhas[objetos->num_linhas].xcentroide = (ponto_inicial_linha.x + x) / 2.0;
+        objetos->linhas[objetos->num_linhas].ycentroide = (ponto_inicial_linha.y + y) / 2.0;
+
         // Incrementa o número de linhas
         objetos->num_linhas++;
         esperando_segundo_ponto = 0;  // Reset para a próxima linha
 
-        printf("Linha adicionada: (%f, %f) -> (%f, %f)\n", ponto_inicial_linha.x, ponto_inicial_linha.y, x, y);
+        printf("Linha adicionada: (%f, %f) -> (%f, %f) | Centroide: (%f, %f)\n",
+               ponto_inicial_linha.x, ponto_inicial_linha.y, x, y,
+               objetos->linhas[objetos->num_linhas - 1].xcentroide, objetos->linhas[objetos->num_linhas - 1].ycentroide);
 
         // Redesenhar a tela
         glutPostRedisplay();
@@ -62,6 +69,8 @@ void adicionar_ponto(ObjetosGeometricos* objetos, float x, float y) {
     objetos->pontos[objetos->num_pontos].x = x;
     objetos->pontos[objetos->num_pontos].y = y;
     objetos->num_pontos++;
+
+    printf("Ponto: (%f, %f)\n", x, y);
 
     // Redesenhar a tela
     glutPostRedisplay();
@@ -119,10 +128,21 @@ void adicionar_poligono(ObjetosGeometricos* objetos, Ponto novo_ponto, int final
             objetos->poligonos[objetos->num_poligonos].pontos = pontos_poligono;
             objetos->poligonos[objetos->num_poligonos].num_pontos = num_pontos_poligono;
 
+            // Cálculo do centróide do polígono
+            float soma_x = 0, soma_y = 0;
+            for (int i = 0; i < num_pontos_poligono; i++) {
+                soma_x += pontos_poligono[i].x;
+                soma_y += pontos_poligono[i].y;
+            }
+            objetos->poligonos[objetos->num_poligonos].xcentroide = soma_x / num_pontos_poligono;
+            objetos->poligonos[objetos->num_poligonos].ycentroide = soma_y / num_pontos_poligono;
+
             // Incrementa o número de polígonos
             objetos->num_poligonos++;
 
-            printf("Polígono finalizado com %d pontos.\n", num_pontos_poligono);
+            printf("Polígono finalizado com %d pontos. Centroide: (%f, %f)\n", num_pontos_poligono,
+                   objetos->poligonos[objetos->num_poligonos - 1].xcentroide,
+                   objetos->poligonos[objetos->num_poligonos - 1].ycentroide);
 
             // Resetar as variáveis estáticas
             pontos_poligono = NULL;
@@ -135,6 +155,7 @@ void adicionar_poligono(ObjetosGeometricos* objetos, Ponto novo_ponto, int final
         }
     }
 }
+
 
 // Função para cancelar a operação atual
 void cancelar_operacao(ObjetosGeometricos* objetos) {
