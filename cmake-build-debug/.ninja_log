@@ -46,3 +46,5 @@
 18	389	7487348890114073	CMakeFiles/paint-cg.dir/objetos.c.obj	91b36e2365b618d9
 33	394	7487348890258864	CMakeFiles/paint-cg.dir/selecoes.c.obj	a181d6445296641b
 394	641	7487348893866108	paint-cg.exe	fd38d1d25e9bfad2
+16	402	7487652867661607	CMakeFiles/paint-cg.dir/main.c.obj	4f680da82500769e
+403	716	7487652871540828	paint-cg.exe	fd38d1d25e9bfad2
