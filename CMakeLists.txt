@@ -5,7 +5,7 @@ set(CMAKE_C_STANDARD 11)
 
 # Adicione os arquivos de origem
 add_executable(paint-cg main.c objetos.c
-        selecoes.c)
+        selecoes.c transformacoes.c)
 
 # Inclua os diretórios necessários
 include_directories("C:/MinGW/include")

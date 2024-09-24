@@ -182,8 +182,11 @@ void cancelar_operacao(ObjetosGeometricos* objetos) {
     }
 }
 
-// Função para desenhar todos os objetos geométricos
+
+
+// Função modificada para desenhar objetos
 void desenhar_objetos(ObjetosGeometricos* objetos) {
+    // Desenha pontos
     glColor3f(1.0f, 0.0f, 0.0f);
     glPointSize(5.0f);
     glBegin(GL_POINTS);
@@ -192,6 +195,7 @@ void desenhar_objetos(ObjetosGeometricos* objetos) {
     }
     glEnd();
 
+    // Desenha linhas
     glColor3f(0.0f, 0.0f, 1.0f);
     glLineWidth(5.0f);
     glBegin(GL_LINES);
@@ -201,14 +205,45 @@ void desenhar_objetos(ObjetosGeometricos* objetos) {
     }
     glEnd();
 
-    // Desenhar os polígonos
-    glColor3f(0.0f, 1.0f, 0.0f);  // Cor dos polígonos
+    // Desenha polígonos com tesselação
     for (int i = 0; i < objetos->num_poligonos; i++) {
-        glBegin(GL_POLYGON);  // Desenhar os polígonos preenchidos
-        for (int j = 0; j < objetos->poligonos[i].num_pontos; j++) {
-            glVertex2f(objetos->poligonos[i].pontos[j].x, objetos->poligonos[i].pontos[j].y);
+        int num_pontos = objetos->poligonos[i].num_pontos;
+        GLdouble** poligon_vertex = (GLdouble**)malloc(num_pontos * sizeof(GLdouble*));
+
+        // Carrega os vértices do polígono
+        for (int j = 0; j < num_pontos; j++) {
+            poligon_vertex[j] = (GLdouble*)malloc(3 * sizeof(GLdouble));
+            poligon_vertex[j][0] = (GLdouble) objetos->poligonos[i].pontos[j].x;
+            poligon_vertex[j][1] = (GLdouble) objetos->poligonos[i].pontos[j].y;
+            poligon_vertex[j][2] = 0.0;  // Como estamos em 2D, o z é 0
         }
-        glEnd();
+
+        // Desenha o polígono com tesselação
+        GLUtesselator* tess = gluNewTess();  // Criar o tesselador
+
+        // Definir callbacks para tesselação
+        gluTessCallback(tess, GLU_TESS_BEGIN, (void (CALLBACK *)())glBegin);
+        gluTessCallback(tess, GLU_TESS_VERTEX, (void (CALLBACK *)())glVertex3dv);
+        gluTessCallback(tess, GLU_TESS_END, (void (CALLBACK *)())glEnd);
+
+        // Definir a cor verde para o polígono antes de iniciar a tesselação
+        glColor3f(0.0f, 1.0f, 0.0f);  // Cor dos polígonos
+        gluTessBeginPolygon(tess, 0);  // Começar o polígono
+        gluTessBeginContour(tess);  // Começar o contorno do polígono
+        for (int k = 0; k < num_pontos; k++) {
+            gluTessVertex(tess, poligon_vertex[k], poligon_vertex[k]);
+        }
+        gluTessEndContour(tess);  // Finalizar o contorno
+        gluTessEndPolygon(tess);  // Finalizar o polígono
+
+        gluDeleteTess(tess);  // Deletar o tesselador após o uso
+
+        // Liberar a memória alocada para cada vértice
+        for (int j = 0; j < num_pontos; j++) {
+            free(poligon_vertex[j]);
+        }
+        free(poligon_vertex);  // Libera a memória alocada para os vértices
     }
+
     glFlush();
 }
