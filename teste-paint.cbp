@@ -38,6 +38,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="objetos.h" />
+		<Unit filename="selecoes.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="selecoes.h" />
 		<Unit filename="transformacoes.c">
 			<Option compilerVar="CC" />
 		</Unit>

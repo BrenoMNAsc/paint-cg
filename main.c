@@ -2,6 +2,7 @@
 #include <GL/glut.h>
 #include "objetos.h"
 #include "selecoes.h"
+#include "transformacoes.h"
 
 // Variáveis globais
 ObjetosGeometricos objetos;
@@ -53,21 +54,21 @@ void inicializar() {
 // Função de teclado
 void teclado(unsigned char key, int x, int y) {
     switch (key) {
-        case 'q':
+        case 'i':
             if (modo_desenho != 0) {
                 cancelar_operacao(&objetos);
                 modo_desenho = 0;  // Modo de desenhar pontos
                 printf("Modo: Pontos\n");
             }
             break;
-        case 'w':
+        case 'o':
             if (modo_desenho != 1) {
                 if(modo_desenho == 2) cancelar_operacao(&objetos);
                 modo_desenho = 1;  // Modo de desenhar linhas
                 printf("Modo: Linhas\n");
             }
             break;
-        case 'e':
+        case 'p':
             if(modo_desenho != 2) {
                 if(modo_desenho == 1) cancelar_operacao(&objetos);
                 modo_desenho = 2;  // Modo de desenhar polígonos
@@ -82,8 +83,154 @@ void teclado(unsigned char key, int x, int y) {
                 printf("Polígono finalizado!\n");
             }
             break;
+        case 'l':
+            if (objetos.linha_selecionada != -1) {
+                calcularCentroideLinha(&objetos.linhas[objetos.linha_selecionada]);
+                transladar(-objetos.linhas[objetos.linha_selecionada].xcentroide, -objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
+                rotacionar(10, &objetos.linhas[objetos.linha_selecionada], LINHA);
+                transladar(objetos.linhas[objetos.linha_selecionada].xcentroide, objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                calcularCentroidePoligono(&objetos.poligonos[objetos.poligono_selecionado]);
+                transladar(-objetos.poligonos[objetos.poligono_selecionado].xcentroide, -objetos.poligonos[objetos.poligono_selecionado].ycentroide, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+                rotacionar(10, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+                transladar(objetos.poligonos[objetos.poligono_selecionado].xcentroide, objetos.poligonos[objetos.poligono_selecionado].ycentroide, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case 'r':
+            if (objetos.linha_selecionada != -1) {
+                calcularCentroideLinha(&objetos.linhas[objetos.linha_selecionada]);
+                transladar(-objetos.linhas[objetos.linha_selecionada].xcentroide, -objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
+                rotacionar(-10, &objetos.linhas[objetos.linha_selecionada], LINHA);
+                transladar(objetos.linhas[objetos.linha_selecionada].xcentroide, objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                calcularCentroidePoligono(&objetos.poligonos[objetos.poligono_selecionado]);
+                transladar(-objetos.poligonos[objetos.poligono_selecionado].xcentroide, -objetos.poligonos[objetos.poligono_selecionado].ycentroide, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+                rotacionar(-10, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+                transladar(objetos.poligonos[objetos.poligono_selecionado].xcentroide, objetos.poligonos[objetos.poligono_selecionado].ycentroide, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case '+':
+            if (objetos.ponto_selecionado != -1) {
+                //escalar(2.0, 2.0, &objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                calcularCentroideLinha(&objetos.linhas[objetos.linha_selecionada]);
+                transladar(-objetos.linhas[objetos.linha_selecionada].xcentroide, -objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
+                escalar(2.0, 2.0, &objetos.linhas[objetos.linha_selecionada], LINHA);
+                transladar(objetos.linhas[objetos.linha_selecionada].xcentroide, objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                calcularCentroidePoligono(&objetos.poligonos[objetos.poligono_selecionado]);
+                transladar(-objetos.poligonos[objetos.poligono_selecionado].xcentroide, -objetos.poligonos[objetos.poligono_selecionado].ycentroide, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+                escalar(2.0, 2.0, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+                transladar(objetos.poligonos[objetos.poligono_selecionado].xcentroide, objetos.poligonos[objetos.poligono_selecionado].ycentroide, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case '-':
+            if (objetos.ponto_selecionado != -1) {
+                //escalar(0.5, 0.5, &objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                calcularCentroideLinha(&objetos.linhas[objetos.linha_selecionada]);
+                transladar(-objetos.linhas[objetos.linha_selecionada].xcentroide, -objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
+                escalar(0.5, 0.5, &objetos.linhas[objetos.linha_selecionada], LINHA);
+                transladar(objetos.linhas[objetos.linha_selecionada].xcentroide, objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                calcularCentroidePoligono(&objetos.poligonos[objetos.poligono_selecionado]);
+                transladar(-objetos.poligonos[objetos.poligono_selecionado].xcentroide, -objetos.poligonos[objetos.poligono_selecionado].ycentroide, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+                escalar(0.5, 0.5, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+                transladar(objetos.poligonos[objetos.poligono_selecionado].xcentroide, objetos.poligonos[objetos.poligono_selecionado].ycentroide, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case 'x':
+            if (objetos.ponto_selecionado != -1) {
+                cisalhamento_x(2.0, &objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                cisalhamento_x(2.0, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                cisalhamento_x(2.0, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case 'y':
+            if (objetos.ponto_selecionado != -1) {
+                cisalhamento_y(2.0, &objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                cisalhamento_y(2.0, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                cisalhamento_y(2.0, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case 'v':
+            if (objetos.ponto_selecionado != -1) {
+                reflexao_vertical(&objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                reflexao_vertical(&objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                reflexao_vertical(&objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case 'h':
+            if (objetos.ponto_selecionado != -1) {
+                reflexao_horizontal(&objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                reflexao_horizontal(&objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                reflexao_horizontal(&objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case 'z':
+            if (objetos.ponto_selecionado != -1) {
+                reflexao_diagonal(&objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                reflexao_diagonal(&objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                reflexao_diagonal(&objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
     }
+    glutPostRedisplay();
 }
+
+void teclas_especiais(int key, int x, int y) {
+    switch (key) {
+        case GLUT_KEY_UP:
+            if (objetos.ponto_selecionado != -1) {
+                transladar(0, 5, &objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                transladar(0, 5, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                transladar(0, 5, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case GLUT_KEY_DOWN:
+            if (objetos.ponto_selecionado != -1) {
+                transladar(0, -5, &objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                transladar(0, -5, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                transladar(0, -5, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case GLUT_KEY_LEFT:
+            if (objetos.ponto_selecionado != -1) {
+                transladar(-5, 0, &objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                transladar(-5, 0, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                transladar(-5, 0, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+        case GLUT_KEY_RIGHT:
+            if (objetos.ponto_selecionado != -1) {
+                transladar(5, 0, &objetos.pontos[objetos.ponto_selecionado], PONTO);
+            } else if (objetos.linha_selecionada != -1) {
+                transladar(5, 0, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if (objetos.poligono_selecionado != -1) {
+                transladar(5, 0, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
+            }
+            break;
+    }
+    glutPostRedisplay();
+}
+
+
 
 // Função de mouse
 void mouse(int button, int state, int x, int y) {
@@ -134,6 +281,7 @@ int main(int argc, char** argv) {
     glutDisplayFunc(display);
     glutMouseFunc(mouse);
     glutKeyboardFunc(teclado);  // Define a função de teclado
+    glutSpecialFunc(teclas_especiais);
     glutReshapeFunc(reshape);
     glutPassiveMotionFunc(passive_motion);  // Atualiza a posição do mouse enquanto ele se move
 

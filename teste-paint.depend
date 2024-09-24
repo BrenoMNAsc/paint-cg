@@ -1,25 +1,35 @@
 # depslib dependency file v1.0
-1727027285 source:c:\users\computador\downloads\c\teste-paint\main.c
+1727185990 source:c:\users\computador\downloads\c\teste-paint\main.c
 	<stdio.h>
 	<GL/glut.h>
 	"objetos.h"
+	"selecoes.h"
 	"transformacoes.h"
 
-1727034256 c:\users\computador\downloads\c\teste-paint\objetos.h
+1727185705 c:\users\computador\downloads\c\teste-paint\objetos.h
 
-1726852432 source:c:\users\computador\downloads\c\teste-paint\objetos.c
+1727185705 source:c:\users\computador\downloads\c\teste-paint\objetos.c
 	<stdio.h>
 	"objetos.h"
 	<stdlib.h>
 	<GL/glut.h>
 
-1727033304 source:c:\users\computador\downloads\c\teste-paint\transformacoes.c
+1727185871 source:c:\users\computador\downloads\c\teste-paint\transformacoes.c
 	"transformacoes.h"
-	"objetos.h"
 	<stdlib.h>
 	<stdio.h>
 
-1727033304 c:\users\computador\downloads\c\teste-paint\transformacoes.h
+1727185871 c:\users\computador\downloads\c\teste-paint\transformacoes.h
 	<GL/glut.h>
 	<math.h>
+	"objetos.h"
+
+1727172437 c:\users\computador\downloads\c\teste-paint\selecoes.h
+	"objetos.h"
+
+1727175007 source:c:\users\computador\downloads\c\teste-paint\selecoes.c
+	<stdio.h>
+	<GL/glut.h>
+	"selecoes.h"
+	"objetos.h"
 

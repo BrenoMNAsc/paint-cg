@@ -3,6 +3,7 @@
 
 #include <GL/glut.h>
 #include <math.h>
+#include "objetos.h"
 
 typedef enum {
     PONTO,
@@ -10,7 +11,11 @@ typedef enum {
     POLIGONO
 } TipoObjeto;
 
-void multMatriz(GLfloat matriz[3][3], void* objeto, TipoObjeto tipo);
+void multMatrizPonto(GLfloat matriz[3][3], Ponto* ponto);
+void multMatrizLinha(GLfloat matriz[3][3], Linha* linha);
+void multMatrizPoligono(GLfloat matriz[3][3], Poligono* poligono);
+void calcularCentroideLinha(Linha* linha);
+void calcularCentroidePoligono(Poligono* poligono);
 void transladar(GLfloat tx, GLfloat ty, void* objeto, TipoObjeto tipo);
 void rotacionar(GLfloat angulo, void* objeto, TipoObjeto tipo);
 void escalar(GLfloat sx, GLfloat sy, void* objeto, TipoObjeto tipo);
