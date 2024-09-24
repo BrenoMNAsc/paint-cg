@@ -1,0 +1,19 @@
+# ninja log v6
+4	442	7489001655039141	CMakeFiles/paint-cg.dir/main.c.obj	4f680da82500769e
+14	436	7489001655129510	CMakeFiles/paint-cg.dir/objetos.c.obj	91b36e2365b618d9
+31	429	7489001655308617	CMakeFiles/paint-cg.dir/transformacoes.c.obj	a2f4bf54603b9a5c
+442	647	7489001659414005	paint-cg.exe	c012daaf0f03984f
+22	434	7489001655218615	CMakeFiles/paint-cg.dir/selecoes.c.obj	a181d6445296641b
+2	294	7489201214719256	build.ninja	513ce59fc016589
+32	378	7489204281422952	CMakeFiles/paint-cg.dir/arquivos.c.obj	f684fc03a0b2b2fe
+5	419	7489204281155084	CMakeFiles/paint-cg.dir/main.c.obj	4f680da82500769e
+19	578	7489204281297360	CMakeFiles/paint-cg.dir/cJSON.c.obj	9e3489b342ba104c
+579	897	7489204286887163	paint-cg.exe	b7d7757b1153ed0f
+3	378	7489210763714323	CMakeFiles/paint-cg.dir/main.c.obj	4f680da82500769e
+379	693	7489210767473027	paint-cg.exe	b7d7757b1153ed0f
+51	383	7489213893374199	CMakeFiles/paint-cg.dir/arquivos.c.obj	f684fc03a0b2b2fe
+16	435	7489213893029158	CMakeFiles/paint-cg.dir/objetos.c.obj	91b36e2365b618d9
+28	451	7489213893141967	CMakeFiles/paint-cg.dir/selecoes.c.obj	a181d6445296641b
+3	454	7489213892883325	CMakeFiles/paint-cg.dir/main.c.obj	4f680da82500769e
+39	461	7489213893256872	CMakeFiles/paint-cg.dir/transformacoes.c.obj	a2f4bf54603b9a5c
+462	757	7489213897481464	paint-cg.exe	b7d7757b1153ed0f
