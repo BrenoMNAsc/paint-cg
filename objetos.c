@@ -24,26 +24,22 @@ ObjetosGeometricos criar_objetos() {
 // Função para adicionar linha
 void adicionar_linha(ObjetosGeometricos* objetos, float x, float y) {
     if (esperando_segundo_ponto == 0) {
-        // Primeiro clique, armazena o ponto inicial
         ponto_inicial_linha.x = x;
         ponto_inicial_linha.y = y;
-        esperando_segundo_ponto = 1;  // Agora espera o segundo ponto
+        esperando_segundo_ponto = 1;
         printf("Primeiro ponto da linha: (%f, %f)\n", x, y);
         adicionar_ponto(objetos, x, y);
     } else {
-        // Segundo clique, armazena o ponto final e adiciona a linha
         remover_ultimo_ponto(objetos);
         objetos->linhas = realloc(objetos->linhas, (objetos->num_linhas + 1) * sizeof(Linha));
         if (objetos->linhas == NULL) {
             fprintf(stderr, "Erro ao alocar memória para as linhas.\n");
             exit(EXIT_FAILURE);
         }
-        // Define os pontos da linha
         objetos->linhas[objetos->num_linhas].inicio = ponto_inicial_linha;
         objetos->linhas[objetos->num_linhas].fim.x = x;
         objetos->linhas[objetos->num_linhas].fim.y = y;
 
-        // Cálculo do centróide da linha (ponto médio)
         objetos->linhas[objetos->num_linhas].xcentroide = (ponto_inicial_linha.x + x) / 2.0;
         objetos->linhas[objetos->num_linhas].ycentroide = (ponto_inicial_linha.y + y) / 2.0;
 
@@ -72,7 +68,6 @@ void adicionar_ponto(ObjetosGeometricos* objetos, float x, float y) {
 
     printf("Ponto: (%f, %f)\n", x, y);
 
-    // Redesenhar a tela
     glutPostRedisplay();
 }
 
@@ -154,6 +149,51 @@ void adicionar_poligono(ObjetosGeometricos* objetos, Ponto novo_ponto, int final
             printf("Polígono precisa de pelo menos 3 pontos.\n");
         }
     }
+}
+
+void deletar_objeto_selecionado(ObjetosGeometricos* objetos) {
+    // Verifica se há um ponto selecionado e o remove
+    if (objetos->ponto_selecionado != -1) {
+        int idx = objetos->ponto_selecionado;
+        for (int i = idx; i < objetos->num_pontos - 1; i++) {
+            objetos->pontos[i] = objetos->pontos[i + 1];  // Desloca os pontos para preencher o espaço vazio
+        }
+        objetos->num_pontos--;  // Decrementa o número de pontos
+        objetos->pontos = realloc(objetos->pontos, objetos->num_pontos * sizeof(Ponto));
+        objetos->ponto_selecionado = -1;  // Reseta a seleção
+        printf("Ponto deletado. Agora há %d pontos.\n", objetos->num_pontos);
+    }
+
+    // Verifica se há uma linha selecionada e a remove
+    else if (objetos->linha_selecionada != -1) {
+        int idx = objetos->linha_selecionada;
+        for (int i = idx; i < objetos->num_linhas - 1; i++) {
+            objetos->linhas[i] = objetos->linhas[i + 1];  // Desloca as linhas para preencher o espaço vazio
+        }
+        objetos->num_linhas--;  // Decrementa o número de linhas
+        objetos->linhas = realloc(objetos->linhas, objetos->num_linhas * sizeof(Linha));
+        objetos->linha_selecionada = -1;  // Reseta a seleção
+        printf("Linha deletada. Agora há %d linhas.\n", objetos->num_linhas);
+    }
+
+    // Verifica se há um polígono selecionado e o remove
+    else if (objetos->poligono_selecionado != -1) {
+        int idx = objetos->poligono_selecionado;
+
+        // Libera a memória dos pontos do polígono
+        free(objetos->poligonos[idx].pontos);
+
+        for (int i = idx; i < objetos->num_poligonos - 1; i++) {
+            objetos->poligonos[i] = objetos->poligonos[i + 1];  // Desloca os polígonos para preencher o espaço vazio
+        }
+        objetos->num_poligonos--;  // Decrementa o número de polígonos
+        objetos->poligonos = realloc(objetos->poligonos, objetos->num_poligonos * sizeof(Poligono));
+        objetos->poligono_selecionado = -1;  // Reseta a seleção
+        printf("Polígono deletado. Agora há %d polígonos.\n", objetos->num_poligonos);
+    }
+
+    // Redesenhar a tela após a exclusão
+    glutPostRedisplay();
 }
 
 

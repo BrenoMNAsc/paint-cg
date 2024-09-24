@@ -3,52 +3,30 @@
 #include "objetos.h"
 #include "selecoes.h"
 #include "transformacoes.h"
+#include "arquivos.h"
 
 // Variáveis globais
 ObjetosGeometricos objetos;
 int modo_desenho = 0;  // 0: pontos, 1: linhas, 2: polígonos
 float mouse_x = 0.0f, mouse_y = 0.0f;  // Coordenadas atuais do mouse
 
-// Função para desenhar uma caixa de tolerância de 5x5 ao redor do mouse
-void desenhar_caixa_tolerancia(float x, float y) {
-    float half_size = 5.0f / 2.0f;  // Metade do tamanho da caixa
-    glColor3f(0.0f, 1.0f, 0.0f);  // Cor da caixa (verde)
-    glBegin(GL_LINE_LOOP);
-        glVertex2f(x - half_size, y - half_size);  // Canto inferior esquerdo
-        glVertex2f(x + half_size, y - half_size);  // Canto inferior direito
-        glVertex2f(x + half_size, y + half_size);  // Canto superior direito
-        glVertex2f(x - half_size, y + half_size);  // Canto superior esquerdo
-    glEnd();
-}
-
 // Função de exibição
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     desenhar_objetos(&objetos);
 
-    // Desenhar a caixa de tolerância no ponto atual do mouse
-    desenhar_caixa_tolerancia(mouse_x, mouse_y);
 
     glutSwapBuffers();  // Para duplo buffer
 }
 
 void reshape(int w, int h) {
-    glViewport(0, 0, w, h);  // Ajusta o viewport para o tamanho da janela
+    glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-    // Manter o sistema de coordenadas fixo de 0 a 500 em ambas as direções
-    gluOrtho2D(0.0, 500.0, 0.0, 500.0);
+    gluOrtho2D(-250.0, 250.0, -250.0, 250.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-}
-
-// Função de inicialização
-void inicializar() {
-    objetos = criar_objetos();
-    glClearColor(1.0, 1.0, 1.0, 1.0);
-    gluOrtho2D(0.0, 500.0, 0.0, 500.0);
 }
 
 // Função de teclado
@@ -175,6 +153,10 @@ void teclado(unsigned char key, int x, int y) {
                 reflexao_horizontal(&objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
             }
             break;
+        case 0x7F:  // Tecla Delete
+            deletar_objeto_selecionado(&objetos);  // Chama a função para deletar o objeto selecionado
+            printf("Objeto deletado!\n");
+            break;
         case 'z':
             if (objetos.ponto_selecionado != -1) {
                 reflexao_diagonal(&objetos.pontos[objetos.ponto_selecionado], PONTO);
@@ -184,6 +166,8 @@ void teclado(unsigned char key, int x, int y) {
                 reflexao_diagonal(&objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
             }
             break;
+        case 'g':
+            salvar_json(&objetos);
     }
     glutPostRedisplay();
 }
@@ -236,8 +220,9 @@ void teclas_especiais(int key, int x, int y) {
 void mouse(int button, int state, int x, int y) {
     int width = glutGet(GLUT_WINDOW_WIDTH);
     int height = glutGet(GLUT_WINDOW_HEIGHT);
-    float x_convertido = (float)x / width * 500.0f;
-    float y_convertido = (float)(height - y) / height * 500.0f;
+    float x_convertido = ((float)x / width) * 500.0f - 250.0f;
+    float y_convertido = ((float)(height - y) / height) * 500.0f - 250.0f;
+
 
     if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
 
@@ -246,7 +231,7 @@ void mouse(int button, int state, int x, int y) {
         } else if (modo_desenho == 1) {
             adicionar_linha(&objetos, x_convertido, y_convertido);
         } else if (modo_desenho == 2) {
-            adicionar_poligono(&objetos, (Ponto){x_convertido, y_convertido}, 0);  // Adiciona vértice ao polígono
+            adicionar_poligono(&objetos, (Ponto){x_convertido, y_convertido}, 0);
             printf("Vértice do polígono adicionado: (%f, %f)\n", x_convertido, y_convertido);
         }
     } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
@@ -258,16 +243,30 @@ void mouse(int button, int state, int x, int y) {
     glutPostRedisplay();
 }
 
-// Função chamada sempre que o mouse se move, usada para atualizar a posição do mouse
 void passive_motion(int x, int y) {
     int width = glutGet(GLUT_WINDOW_WIDTH);
     int height = glutGet(GLUT_WINDOW_HEIGHT);
 
-    // Converte as coordenadas da tela para o sistema de coordenadas da janela (0 a 500)
-    mouse_x = (float)x / width * 500.0f;
-    mouse_y = (float)(height - y) / height * 500.0f;
+    mouse_x = ((float)x / width) * 500.0f - 250.0f;
+    mouse_y = ((float)(height - y) / height) * 500.0f - 250.0f;
 
-    glutPostRedisplay();  // Solicita a atualização da tela
+    glutPostRedisplay();
+}
+
+void inicializar() {
+    objetos = criar_objetos();
+
+    FILE *file = fopen("desenhos.json", "r");
+    if (file) {
+        fclose(file);
+        carregar_json(&objetos);
+        printf("Arquivo 'desenhos.json' carregado com sucesso.\n");
+    } else {
+        printf("Arquivo 'desenhos.json' não encontrado. Nenhum dado carregado.\n");
+    }
+
+    glClearColor(1.0, 1.0, 1.0, 1.0);
+    gluOrtho2D(0.0, 500.0, 0.0, 500.0);
 }
 
 int main(int argc, char** argv) {
@@ -280,10 +279,10 @@ int main(int argc, char** argv) {
 
     glutDisplayFunc(display);
     glutMouseFunc(mouse);
-    glutKeyboardFunc(teclado);  // Define a função de teclado
+    glutKeyboardFunc(teclado);
     glutSpecialFunc(teclas_especiais);
     glutReshapeFunc(reshape);
-    glutPassiveMotionFunc(passive_motion);  // Atualiza a posição do mouse enquanto ele se move
+    glutPassiveMotionFunc(passive_motion);
 
     glutMainLoop();
 

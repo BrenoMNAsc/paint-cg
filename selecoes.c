@@ -42,6 +42,7 @@ void selecionar_ponto(ObjetosGeometricos* objetos, float x, float y) {
 
     if (!ponto_selecionado) {
         printf("Nenhum ponto selecionado.\n");
+        objetos->ponto_selecionado = -1;
     }
 
 }
@@ -60,25 +61,25 @@ void selecionar_linha(ObjetosGeometricos* objetos, float x, float y) {
         int fab = 0;
         int fac = 0;
 
-        // Extrair as coordenadas do início (x0, y0) e do fim (x1, y1) da linha
+        // Extrair as coordenadas do in?cio (x0, y0) e do fim (x1, y1) da linha
         float x0 = objetos->linhas[i].inicio.x;
         float y0 = objetos->linhas[i].inicio.y;
         float x1 = objetos->linhas[i].fim.x;
         float y1 = objetos->linhas[i].fim.y;
 
-        // Detectar o recorte para o vértice inicial da linha
-        if (x0 < x - tolerancia) ie = 1;  // À esquerda da região
-        if (x0 > x + tolerancia) id = 1;  // À direita da região
-        if (y0 < y - tolerancia) iab = 1; // Abaixo da região
-        if (y0 > y + tolerancia) iac = 1; // Acima da região
+        // Detectar o recorte para o v?rtice inicial da linha
+        if (x0 < x - tolerancia) ie = 1;  // ? esquerda da regi?o
+        if (x0 > x + tolerancia) id = 1;  // ? direita da regi?o
+        if (y0 < y - tolerancia) iab = 1; // Abaixo da regi?o
+        if (y0 > y + tolerancia) iac = 1; // Acima da regi?o
 
-        // Detectar o recorte para o vértice final da linha
-        if (x1 < x - tolerancia) fe = 1;  // À esquerda da região
-        if (x1 > x + tolerancia) fd = 1;  // À direita da região
-        if (y1 < y - tolerancia) fab = 1; // Abaixo da região
-        if (y1 > y + tolerancia) fac = 1; // Acima da região
+        // Detectar o recorte para o v?rtice final da linha
+        if (x1 < x - tolerancia) fe = 1;  // ? esquerda da regi?o
+        if (x1 > x + tolerancia) fd = 1;  // ? direita da regi?o
+        if (y1 < y - tolerancia) fab = 1; // Abaixo da regi?o
+        if (y1 > y + tolerancia) fac = 1; // Acima da regi?o
 
-        // Verificar se a linha está trivialmente dentro ou trivialmente fora
+        // Verificar se a linha est? trivialmente dentro ou trivialmente fora
         if ((ie == 0 && id == 0 && iab == 0 && iac == 0) || (fe == 0 && fd == 0 && fab == 0 && fac == 0)) {
             printf("Linha selecionada\n");
             objetos->linha_selecionada = i;
@@ -87,39 +88,39 @@ void selecionar_linha(ObjetosGeometricos* objetos, float x, float y) {
             linha_selecionada = 1;
             break;
         }
-        if ((ie == 1 && fe == 1) || (iab == 1 && fd == 1) || (iac == 1 && fac == 1) || (iab == 1 && fab == 1))
+        if ((ie == 1 && fe == 1) || (id == 1 && fd == 1) || (iac == 1 && fac == 1) || (iab == 1 && fab == 1))
             break;
-        // Não trivialmente dentro, aplicar lógica de recorte
+        // N?o trivialmente dentro, aplicar l?gica de recorte
         while (1) {
-            // Recorte à esquerda para o ponto inicial
+            // Recorte ? esquerda para o ponto inicial
             if (ie == 1) {
                 andar(&x0, &y0, x1, y1, x - tolerancia, 1, 0);  // Mover para a fronteira esquerda
-                printf("Mover vértice para fronteira esquerda, novo início: (%f, %f)\n", x0, y0);
+                printf("Mover v?rtice para fronteira esquerda, novo in?cio: (%f, %f)\n", x0, y0);
             }
-            // Recorte à direita para o ponto inicial
+            // Recorte ? direita para o ponto inicial
             else if (id == 1) {
                 andar(&x0, &y0, x1, y1, x + tolerancia, 1, 0);  // Mover para a fronteira direita
-                printf("Mover vértice para fronteira direita, novo início: (%f, %f)\n", x0, y0);
+                printf("Mover v?rtice para fronteira direita, novo in?cio: (%f, %f)\n", x0, y0);
             }
             // Recorte abaixo para o ponto inicial
             else if (iab == 1) {
                 andar(&x0, &y0, x1, y1, y - tolerancia, 0, 1);  // Mover para a fronteira inferior
-                printf("Mover vértice para fronteira inferior, novo início: (%f, %f)\n", x0, y0);
+                printf("Mover v?rtice para fronteira inferior, novo in?cio: (%f, %f)\n", x0, y0);
             }
             // Recorte acima para o ponto inicial
             else if (iac == 1) {
                 andar(&x0, &y0, x1, y1, y + tolerancia, 0, 1);  // Mover para a fronteira superior
-                printf("Mover vértice para fronteira superior, novo início: (%f, %f)\n", x0, y0);
+                printf("Mover v?rtice para fronteira superior, novo in?cio: (%f, %f)\n", x0, y0);
             }
 
-            // Recode o vértice inicial após movê-lo
+            // Recode o v?rtice inicial ap?s mov?-lo
             ie = id = iab = iac = 0;
             if (x0 < x - tolerancia) ie = 1;
             if (x0 > x + tolerancia) id = 1;
             if (y0 < y - tolerancia) iab = 1;
             if (y0 > y + tolerancia) iac = 1;
 
-            // Se o vértice inicial agora estiver trivialmente dentro, saia
+            // Se o v?rtice inicial agora estiver trivialmente dentro, saia
             if (ie == 0 && id == 0 && iab == 0 && iac == 0) {
                 printf("Vertice dentro apos movimento\n");
                 objetos->linha_selecionada = i;
@@ -129,7 +130,7 @@ void selecionar_linha(ObjetosGeometricos* objetos, float x, float y) {
                 break;
             }
 
-            // Pare após o recorte, pode ser estendido para mais casos complexos
+            // Pare ap?s o recorte, pode ser estendido para mais casos complexos
             break;
         }
     }
@@ -196,4 +197,5 @@ void selecionar_area(ObjetosGeometricos* objetos, float x, float y) {
     }
     // Se nao selecionar nenhum poligono
     printf("Nenhum poligono selecionado\n");
+    objetos->poligono_selecionado = -1;
 }
