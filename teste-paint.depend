@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1727185990 source:c:\users\computador\downloads\c\teste-paint\main.c
+1727196800 source:c:\users\computador\downloads\c\teste-paint\main.c
 	<stdio.h>
 	<GL/glut.h>
 	"objetos.h"
@@ -14,7 +14,7 @@
 	<stdlib.h>
 	<GL/glut.h>
 
-1727185871 source:c:\users\computador\downloads\c\teste-paint\transformacoes.c
+1727200003 source:c:\users\computador\downloads\c\teste-paint\transformacoes.c
 	"transformacoes.h"
 	<stdlib.h>
 	<stdio.h>
@@ -27,7 +27,7 @@
 1727172437 c:\users\computador\downloads\c\teste-paint\selecoes.h
 	"objetos.h"
 
-1727175007 source:c:\users\computador\downloads\c\teste-paint\selecoes.c
+1727186224 source:c:\users\computador\downloads\c\teste-paint\selecoes.c
 	<stdio.h>
 	<GL/glut.h>
 	"selecoes.h"

@@ -36,10 +36,7 @@ void reshape(int w, int h) {
     glViewport(0, 0, w, h);  // Ajusta o viewport para o tamanho da janela
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-    // Manter o sistema de coordenadas fixo de 0 a 500 em ambas as direções
-    gluOrtho2D(0.0, 500.0, 0.0, 500.0);
-
+    gluOrtho2D(-250.0, 250.0, -250.0, 250.0);  // Centraliza o eixo das coordenadas
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
@@ -48,7 +45,7 @@ void reshape(int w, int h) {
 void inicializar() {
     objetos = criar_objetos();
     glClearColor(1.0, 1.0, 1.0, 1.0);
-    gluOrtho2D(0.0, 500.0, 0.0, 500.0);
+    gluOrtho2D(-250.0, 250.0, -250.0, 250.0);  // Centraliza o eixo das coordenadas
 }
 
 // Função de teclado
@@ -236,11 +233,10 @@ void teclas_especiais(int key, int x, int y) {
 void mouse(int button, int state, int x, int y) {
     int width = glutGet(GLUT_WINDOW_WIDTH);
     int height = glutGet(GLUT_WINDOW_HEIGHT);
-    float x_convertido = (float)x / width * 500.0f;
-    float y_convertido = (float)(height - y) / height * 500.0f;
+    float x_convertido = ((float)x / width) * 500.0f - 250.0f;
+    float y_convertido = ((float)(height - y) / height) * 500.0f - 250.0f;
 
     if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
-
         if (modo_desenho == 0) {
             adicionar_ponto(&objetos, x_convertido, y_convertido);
         } else if (modo_desenho == 1) {
@@ -253,7 +249,7 @@ void mouse(int button, int state, int x, int y) {
         selecionar_ponto(&objetos, x_convertido, y_convertido);
         selecionar_linha(&objetos, x_convertido, y_convertido);
         selecionar_area(&objetos, x_convertido, y_convertido);
-        printf("\n\n Seleciondados: %d, %d, %d \n\n", objetos.ponto_selecionado, objetos.linha_selecionada, objetos.poligono_selecionado);
+        printf("\n\n Selecionados: %d, %d, %d \n\n", objetos.ponto_selecionado, objetos.linha_selecionada, objetos.poligono_selecionado);
     }
     glutPostRedisplay();
 }
@@ -264,8 +260,8 @@ void passive_motion(int x, int y) {
     int height = glutGet(GLUT_WINDOW_HEIGHT);
 
     // Converte as coordenadas da tela para o sistema de coordenadas da janela (0 a 500)
-    mouse_x = (float)x / width * 500.0f;
-    mouse_y = (float)(height - y) / height * 500.0f;
+    mouse_x = ((float)x / width) * 500.0f - 250.0f;
+    mouse_y = ((float)(height - y) / height) * 500.0f - 250.0f;
 
     glutPostRedisplay();  // Solicita a atualização da tela
 }
