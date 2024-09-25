@@ -91,6 +91,9 @@ void rotacionar(GLfloat angulo, void* objeto, TipoObjeto tipo) {
     };
 
     switch (tipo) {
+        case PONTO:
+            multMatrizPonto(matriz_rotacao, (Ponto*)objeto);
+            break;
         case LINHA:
             multMatrizLinha(matriz_rotacao, (Linha*)objeto);
             break;

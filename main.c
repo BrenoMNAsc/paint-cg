@@ -67,6 +67,8 @@ void teclado(unsigned char key, int x, int y) {
                 transladar(-objetos.linhas[objetos.linha_selecionada].xcentroide, -objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
                 rotacionar(10, &objetos.linhas[objetos.linha_selecionada], LINHA);
                 transladar(objetos.linhas[objetos.linha_selecionada].xcentroide, objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if(objetos.ponto_selecionado != -1) {
+                    rotacionar(10, &objetos.pontos[objetos.ponto_selecionado], PONTO);
             } else if (objetos.poligono_selecionado != -1) {
                 calcularCentroidePoligono(&objetos.poligonos[objetos.poligono_selecionado]);
                 transladar(-objetos.poligonos[objetos.poligono_selecionado].xcentroide, -objetos.poligonos[objetos.poligono_selecionado].ycentroide, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
@@ -80,6 +82,8 @@ void teclado(unsigned char key, int x, int y) {
                 transladar(-objetos.linhas[objetos.linha_selecionada].xcentroide, -objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
                 rotacionar(-10, &objetos.linhas[objetos.linha_selecionada], LINHA);
                 transladar(objetos.linhas[objetos.linha_selecionada].xcentroide, objetos.linhas[objetos.linha_selecionada].ycentroide, &objetos.linhas[objetos.linha_selecionada], LINHA);
+            } else if(objetos.ponto_selecionado != -1) {
+                rotacionar(-10, &objetos.pontos[objetos.ponto_selecionado], PONTO);
             } else if (objetos.poligono_selecionado != -1) {
                 calcularCentroidePoligono(&objetos.poligonos[objetos.poligono_selecionado]);
                 transladar(-objetos.poligonos[objetos.poligono_selecionado].xcentroide, -objetos.poligonos[objetos.poligono_selecionado].ycentroide, &objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
