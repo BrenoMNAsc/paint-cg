@@ -84,7 +84,11 @@ void rotacionar(GLfloat angulo, void* objeto, TipoObjeto tipo) {
     GLfloat cose = cos(angulo * M_PI / 180.0);
     GLfloat sen = sin(angulo * M_PI / 180.0);
 
-    GLfloat matriz_rotacao[3][3] = {
+    GLfloat matriz_r
+
+
+
+    otacao[3][3] = {
         {cose, -sen, 0.0},
         {sen, cose, 0.0},
         {0.0, 0.0, 1.0}

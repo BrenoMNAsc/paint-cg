@@ -7,7 +7,6 @@
 
 ObjetosGeometricos objetos;
 int modo_desenho = 0;
-float mouse_x = 0.0f, mouse_y = 0.0f;
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -163,9 +162,8 @@ void teclado(unsigned char key, int x, int y) {
             break;
         case 0x7F:
             deletar_objeto_selecionado(&objetos);
-            printf("Objeto deletado!\n");
             break;
-        case 'z':
+        case 'd':
             if (objetos.ponto_selecionado != -1) {
                 reflexao_diagonal(&objetos.pontos[objetos.ponto_selecionado], PONTO);
             } else if (objetos.linha_selecionada != -1) {
@@ -247,13 +245,11 @@ void mouse(int button, int state, int x, int y) {
             adicionar_linha(&objetos, x_convertido, y_convertido);
         } else if (modo_desenho == 2) {
             adicionar_poligono(&objetos, (Ponto){x_convertido, y_convertido}, 0);
-            printf("Vértice do polígono adicionado: (%f, %f)\n", x_convertido, y_convertido);
         }
     } else if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         selecionar_ponto(&objetos, x_convertido, y_convertido);
         selecionar_linha(&objetos, x_convertido, y_convertido);
         selecionar_area(&objetos, x_convertido, y_convertido);
-        printf("\n\n Selecionados: %d, %d, %d \n\n", objetos.ponto_selecionado, objetos.linha_selecionada, objetos.poligono_selecionado);
     }
 
     glutPostRedisplay();

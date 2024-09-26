@@ -23,15 +23,10 @@ void adicionar_linha(ObjetosGeometricos* objetos, float x, float y) {
         ponto_inicial_linha.x = x;
         ponto_inicial_linha.y = y;
         esperando_segundo_ponto = 1;
-        printf("Primeiro ponto da linha: (%f, %f)\n", x, y);
         adicionar_ponto(objetos, x, y);
     } else {
         remover_ultimo_ponto(objetos);
         objetos->linhas = realloc(objetos->linhas, (objetos->num_linhas + 1) * sizeof(Linha));
-        if (objetos->linhas == NULL) {
-            fprintf(stderr, "Erro ao alocar memória para as linhas.\n");
-            exit(EXIT_FAILURE);
-        }
         objetos->linhas[objetos->num_linhas].inicio = ponto_inicial_linha;
         objetos->linhas[objetos->num_linhas].fim.x = x;
         objetos->linhas[objetos->num_linhas].fim.y = y;
@@ -41,10 +36,6 @@ void adicionar_linha(ObjetosGeometricos* objetos, float x, float y) {
 
         objetos->num_linhas++;
         esperando_segundo_ponto = 0;
-
-        printf("Linha adicionada: (%f, %f) -> (%f, %f) | Centroide: (%f, %f)\n",
-               ponto_inicial_linha.x, ponto_inicial_linha.y, x, y,
-               objetos->linhas[objetos->num_linhas - 1].xcentroide, objetos->linhas[objetos->num_linhas - 1].ycentroide);
 
         glutPostRedisplay();
     }
@@ -56,7 +47,6 @@ void adicionar_ponto(ObjetosGeometricos* objetos, float x, float y) {
     objetos->pontos[objetos->num_pontos].y = y;
     objetos->num_pontos++;
 
-    printf("Ponto: (%f, %f)\n", x, y);
 
     glutPostRedisplay();
 }
@@ -65,12 +55,7 @@ void remover_ultimo_ponto(ObjetosGeometricos* objetos) {
     if (objetos->num_pontos > 0) {
         objetos->num_pontos--;
         objetos->pontos = realloc(objetos->pontos, objetos->num_pontos * sizeof(Ponto));
-        if (objetos->num_pontos > 0 && objetos->pontos == NULL) {
-            fprintf(stderr, "Erro ao realocar memória após remover ponto.\n");
-            exit(EXIT_FAILURE);
-        }
 
-        printf("Ponto removido. Agora há %d pontos.\n", objetos->num_pontos);
 
         glutPostRedisplay();
     } else {
@@ -91,10 +76,6 @@ void adicionar_poligono(ObjetosGeometricos* objetos, Ponto novo_ponto, int final
                 remover_ultimo_ponto(objetos);
             }
             objetos->poligonos = realloc(objetos->poligonos, (objetos->num_poligonos + 1) * sizeof(Poligono));
-            if (objetos->poligonos == NULL) {
-                fprintf(stderr, "Erro ao alocar memória para os polígonos.\n");
-                exit(EXIT_FAILURE);
-            }
             objetos->poligonos[objetos->num_poligonos].pontos = pontos_poligono;
             objetos->poligonos[objetos->num_poligonos].num_pontos = num_pontos_poligono;
 
@@ -127,7 +108,6 @@ void deletar_objeto_selecionado(ObjetosGeometricos* objetos) {
         objetos->num_pontos--;
         objetos->pontos = realloc(objetos->pontos, objetos->num_pontos * sizeof(Ponto));
         objetos->ponto_selecionado = -1;
-        printf("Ponto deletado. Agora há %d pontos.\n", objetos->num_pontos);
     }
 
     else if (objetos->linha_selecionada != -1) {
@@ -138,7 +118,6 @@ void deletar_objeto_selecionado(ObjetosGeometricos* objetos) {
         objetos->num_linhas--;
         objetos->linhas = realloc(objetos->linhas, objetos->num_linhas * sizeof(Linha));
         objetos->linha_selecionada = -1;
-        printf("Linha deletada. Agora há %d linhas.\n", objetos->num_linhas);
     }
 
     else if (objetos->poligono_selecionado != -1) {

@@ -28,7 +28,6 @@ void selecionar_ponto(ObjetosGeometricos* objetos, float x, float y) {
 
     for (int i = 0; i < objetos->num_pontos; i++) {
         if (pickPonto(objetos->pontos[i].x, objetos->pontos[i].y, x, y, tolerancia)) {
-            printf("Ponto selecionado: (%f, %f)\n", objetos->pontos[i].x, objetos->pontos[i].y);
             objetos->ponto_selecionado = i;
             objetos->linha_selecionada = -1;
             objetos->poligono_selecionado = -1;
@@ -38,7 +37,6 @@ void selecionar_ponto(ObjetosGeometricos* objetos, float x, float y) {
     }
 
     if (!ponto_selecionado) {
-        printf("Nenhum ponto selecionado.\n");
         objetos->ponto_selecionado = -1;
     }
 
@@ -74,7 +72,6 @@ void selecionar_linha(ObjetosGeometricos* objetos, float x, float y) {
         if (y1 > y + tolerancia) fac = 1;
 
         if ((ie == 0 && id == 0 && iab == 0 && iac == 0) || (fe == 0 && fd == 0 && fab == 0 && fac == 0)) {
-            printf("Linha selecionada\n");
             objetos->linha_selecionada = i;
             objetos->ponto_selecionado = -1;
             objetos->poligono_selecionado = -1;
@@ -105,7 +102,6 @@ void selecionar_linha(ObjetosGeometricos* objetos, float x, float y) {
             if (y0 > y + tolerancia) iac = 1;
 
             if (ie == 0 && id == 0 && iab == 0 && iac == 0) {
-                printf("Vertice dentro após movimento\n");
                 objetos->linha_selecionada = i;
                 objetos->ponto_selecionado = -1;
                 objetos->poligono_selecionado = -1;
@@ -118,7 +114,6 @@ void selecionar_linha(ObjetosGeometricos* objetos, float x, float y) {
     }
 
     if (!linha_selecionada) {
-        printf("Nenhuma linha selecionada.\n");
         objetos->linha_selecionada = -1;
     }
 }
@@ -173,11 +168,9 @@ void selecionar_area(ObjetosGeometricos* objetos, float x, float y) {
             objetos->poligono_selecionado = i;
             objetos->ponto_selecionado = -1;
             objetos->linha_selecionada = -1;
-            printf("Poligono %d selecionado\n", i);
             return;
         }
     }
 
-    printf("Nenhum poligono selecionado\n");
     objetos->poligono_selecionado = -1;
 }
