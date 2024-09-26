@@ -6,7 +6,6 @@
 void salvar_json(ObjetosGeometricos* objetos) {
     cJSON *json_objetos = cJSON_CreateObject();
 
-    // Salva os pontos
     cJSON *json_pontos = cJSON_CreateArray();
     for (int i = 0; i < objetos->num_pontos; i++) {
         cJSON *json_ponto = cJSON_CreateObject();
@@ -16,7 +15,6 @@ void salvar_json(ObjetosGeometricos* objetos) {
     }
     cJSON_AddItemToObject(json_objetos, "pontos", json_pontos);
 
-    // Salva as linhas
     cJSON *json_linhas = cJSON_CreateArray();
     for (int i = 0; i < objetos->num_linhas; i++) {
         cJSON *json_linha = cJSON_CreateObject();
@@ -32,7 +30,6 @@ void salvar_json(ObjetosGeometricos* objetos) {
     }
     cJSON_AddItemToObject(json_objetos, "linhas", json_linhas);
 
-    // Salva os polígonos
     cJSON *json_poligonos = cJSON_CreateArray();
     for (int i = 0; i < objetos->num_poligonos; i++) {
         cJSON *json_poligono = cJSON_CreateObject();
@@ -48,7 +45,6 @@ void salvar_json(ObjetosGeometricos* objetos) {
     }
     cJSON_AddItemToObject(json_objetos, "poligonos", json_poligonos);
 
-    // Escreve no arquivo
     char *json_string = cJSON_Print(json_objetos);
     FILE *file = fopen("desenhos.json", "w");
     if (file) {
@@ -58,7 +54,6 @@ void salvar_json(ObjetosGeometricos* objetos) {
         printf("Erro ao abrir o arquivo para salvar os dados.\n");
     }
 
-    // Libera a memória
     cJSON_Delete(json_objetos);
     free(json_string);
 }
@@ -70,7 +65,6 @@ void carregar_json(ObjetosGeometricos* objetos) {
         return;
     }
 
-    // Lê o arquivo
     fseek(file, 0, SEEK_END);
     long length = ftell(file);
     fseek(file, 0, SEEK_SET);
@@ -79,7 +73,6 @@ void carregar_json(ObjetosGeometricos* objetos) {
     fclose(file);
     data[length] = '\0';
 
-    // Parseia o JSON
     cJSON *json_objetos = cJSON_Parse(data);
     if (json_objetos == NULL) {
         printf("Erro ao parsear o arquivo JSON.\n");
@@ -87,7 +80,6 @@ void carregar_json(ObjetosGeometricos* objetos) {
         return;
     }
 
-    // Carrega os pontos
     cJSON *json_pontos = cJSON_GetObjectItem(json_objetos, "pontos");
     objetos->pontos = NULL;
     objetos->num_pontos = 0;
@@ -98,7 +90,6 @@ void carregar_json(ObjetosGeometricos* objetos) {
         adicionar_ponto(objetos, x, y);
     }
 
-    // Carrega as linhas
     cJSON *json_linhas = cJSON_GetObjectItem(json_objetos, "linhas");
     objetos->linhas = NULL;
     objetos->num_linhas = 0;
@@ -112,7 +103,6 @@ void carregar_json(ObjetosGeometricos* objetos) {
                         (float)cJSON_GetObjectItem(fim, "y")->valuedouble);
     }
 
-    // Carrega os polígonos
     cJSON *json_poligonos = cJSON_GetObjectItem(json_objetos, "poligonos");
     objetos->poligonos = NULL;
     objetos->num_poligonos = 0;
@@ -129,7 +119,6 @@ void carregar_json(ObjetosGeometricos* objetos) {
         adicionar_poligono(objetos, novo_ponto, 1);
     }
 
-    // Libera a memória
     cJSON_Delete(json_objetos);
     free(data);
 }

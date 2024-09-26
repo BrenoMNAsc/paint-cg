@@ -5,59 +5,63 @@
 #include "transformacoes.h"
 #include "arquivos.h"
 
-// Variáveis globais
 ObjetosGeometricos objetos;
-int modo_desenho = 0;  // 0: pontos, 1: linhas, 2: polígonos
-float mouse_x = 0.0f, mouse_y = 0.0f;  // Coordenadas atuais do mouse
+int modo_desenho = 0;
+float mouse_x = 0.0f, mouse_y = 0.0f;
 
-// Função de exibição
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     desenhar_objetos(&objetos);
 
 
-    glutSwapBuffers();  // Para duplo buffer
+    glutSwapBuffers();
 }
 
 void reshape(int w, int h) {
     glViewport(0, 0, w, h);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluOrtho2D(-250.0, 250.0, -250.0, 250.0);
+
+    float aspect_ratio = (float)w / (float)h;
+    if (aspect_ratio >= 1.0) {
+        gluOrtho2D(-250.0 * aspect_ratio, 250.0 * aspect_ratio, -250.0, 250.0);
+    } else {
+        gluOrtho2D(-250.0, 250.0, -250.0 / aspect_ratio, 250.0 / aspect_ratio);
+    }
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
 
-// Função de teclado
 void teclado(unsigned char key, int x, int y) {
     switch (key) {
         case 'i':
             if (modo_desenho != 0) {
                 cancelar_operacao(&objetos);
-                modo_desenho = 0;  // Modo de desenhar pontos
+                modo_desenho = 0;
                 printf("Modo: Pontos\n");
             }
             break;
         case 'o':
             if (modo_desenho != 1) {
                 if(modo_desenho == 2) cancelar_operacao(&objetos);
-                modo_desenho = 1;  // Modo de desenhar linhas
+                modo_desenho = 1;
                 printf("Modo: Linhas\n");
             }
             break;
         case 'p':
             if(modo_desenho != 2) {
                 if(modo_desenho == 1) cancelar_operacao(&objetos);
-                modo_desenho = 2;  // Modo de desenhar polígonos
+                modo_desenho = 2;
                 printf("Modo: Polígonos\n");
             }
             break;
         case 27:
             cancelar_operacao(&objetos);
-        case 13:  // Tecla Enter
+        case 13:
             if (modo_desenho == 2) {
-                adicionar_poligono(&objetos, (Ponto){0, 0}, 1);  // Finaliza o polígono
+                adicionar_poligono(&objetos, (Ponto){0, 0}, 1);
                 printf("Polígono finalizado!\n");
             }
             break;
@@ -157,8 +161,8 @@ void teclado(unsigned char key, int x, int y) {
                 reflexao_horizontal(&objetos.poligonos[objetos.poligono_selecionado], POLIGONO);
             }
             break;
-        case 0x7F:  // Tecla Delete
-            deletar_objeto_selecionado(&objetos);  // Chama a função para deletar o objeto selecionado
+        case 0x7F:
+            deletar_objeto_selecionado(&objetos);
             printf("Objeto deletado!\n");
             break;
         case 'z':
@@ -220,16 +224,23 @@ void teclas_especiais(int key, int x, int y) {
 
 
 
-// Função de mouse
 void mouse(int button, int state, int x, int y) {
     int width = glutGet(GLUT_WINDOW_WIDTH);
     int height = glutGet(GLUT_WINDOW_HEIGHT);
-    float x_convertido = ((float)x / width) * 500.0f - 250.0f;
-    float y_convertido = ((float)(height - y) / height) * 500.0f - 250.0f;
 
+    float aspect_ratio = (float)width / (float)height;
+
+    float x_convertido, y_convertido;
+
+    if (aspect_ratio >= 1.0) {
+        x_convertido = ((float)x / width) * 500.0f * aspect_ratio - 250.0f * aspect_ratio;
+        y_convertido = ((float)(height - y) / height) * 500.0f - 250.0f;
+    } else {
+        x_convertido = ((float)x / width) * 500.0f - 250.0f;
+        y_convertido = ((float)(height - y) / height) * 500.0f / aspect_ratio - 250.0f / aspect_ratio;
+    }
 
     if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
-
         if (modo_desenho == 0) {
             adicionar_ponto(&objetos, x_convertido, y_convertido);
         } else if (modo_desenho == 1) {
@@ -242,17 +253,8 @@ void mouse(int button, int state, int x, int y) {
         selecionar_ponto(&objetos, x_convertido, y_convertido);
         selecionar_linha(&objetos, x_convertido, y_convertido);
         selecionar_area(&objetos, x_convertido, y_convertido);
-        printf("\n\n Seleciondados: %d, %d, %d \n\n", objetos.ponto_selecionado, objetos.linha_selecionada, objetos.poligono_selecionado);
+        printf("\n\n Selecionados: %d, %d, %d \n\n", objetos.ponto_selecionado, objetos.linha_selecionada, objetos.poligono_selecionado);
     }
-    glutPostRedisplay();
-}
-
-void passive_motion(int x, int y) {
-    int width = glutGet(GLUT_WINDOW_WIDTH);
-    int height = glutGet(GLUT_WINDOW_HEIGHT);
-
-    mouse_x = ((float)x / width) * 500.0f - 250.0f;
-    mouse_y = ((float)(height - y) / height) * 500.0f - 250.0f;
 
     glutPostRedisplay();
 }
@@ -286,7 +288,6 @@ int main(int argc, char** argv) {
     glutKeyboardFunc(teclado);
     glutSpecialFunc(teclas_especiais);
     glutReshapeFunc(reshape);
-    glutPassiveMotionFunc(passive_motion);
 
     glutMainLoop();
 
